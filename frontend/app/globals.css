@@ -1,0 +1,115 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import 'tailwindcss';
+
+@theme {
+  --font-sans: 'Inter', system-ui, sans-serif;
+  --font-serif: 'Playfair Display', serif;
+  
+  --color-background: hsl(30 100% 97%);
+  --color-foreground: hsl(0 0% 20%);
+  --color-primary: hsl(35 84% 62%);
+  --color-primary-dark: hsl(35 84% 52%);
+  --color-secondary: hsl(0 0% 30%);
+  --color-accent: hsl(35 84% 62%);
+  --color-accent-dark: hsl(35 84% 52%);
+  --color-muted: hsl(0 0% 90%);
+  --color-muted-foreground: hsl(0 0% 45%);
+}
+
+@layer base {
+  * {
+    @apply transition-colors;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-serif font-bold;
+  }
+
+  h1 {
+    @apply text-5xl md:text-6xl;
+  }
+
+  h2 {
+    @apply text-4xl md:text-5xl;
+  }
+
+  h3 {
+    @apply text-2xl md:text-3xl;
+  }
+
+  a {
+    @apply text-foreground hover:text-primary transition-colors;
+  }
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-background;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-muted rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-muted-foreground;
+}
+
+/* Hide scrollbar for horizontal scroll sections */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Image optimization */
+img {
+  @apply max-w-full h-auto;
+}
+
+/* Smooth transitions */
+@layer components {
+  .btn-primary {
+    @apply px-6 py-3 bg-primary text-background rounded-lg font-semibold hover:bg-primary-dark transition-all duration-300;
+  }
+
+  .btn-secondary {
+    @apply px-6 py-3 bg-muted text-foreground rounded-lg font-semibold hover:bg-muted/80 transition-all duration-300;
+  }
+
+  .section-spacing {
+    @apply py-16 md:py-20;
+  }
+
+  .max-container {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+
+  .heading-xl {
+    @apply text-5xl md:text-6xl font-serif font-bold;
+  }
+
+  .heading-lg {
+    @apply text-4xl md:text-5xl font-serif font-bold;
+  }
+
+  .heading-md {
+    @apply text-2xl md:text-3xl font-serif font-bold;
+  }
+}

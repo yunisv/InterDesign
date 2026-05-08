@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx next *)",
+      "Bash(dir \"z:\\\\InterDesign\" /b)",
+      "Bash(Get-ChildItem z:/InterDesign/)",
+      "Bash(Select-Object Name, PSIsContainer)",
+      "Bash(Format-Table)"
+    ]
+  }
+}
