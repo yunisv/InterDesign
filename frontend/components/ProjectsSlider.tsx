@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useRef } from 'react'
 import Image from 'next/image'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 
@@ -15,59 +15,49 @@ interface ProjectsSliderProps {
 }
 
 export default function ProjectsSlider({ projects }: ProjectsSliderProps) {
-  const [current, setCurrent] = useState(0)
+  const scRef = useRef<HTMLDivElement>(null)
 
-  const prev = () => setCurrent((c) => Math.max(c - 1, 0))
-  const next = () => setCurrent((c) => Math.min(c + 1, projects.length - 1))
+  const amount = () => Math.min(466, (scRef.current?.clientWidth ?? 900) * 0.8)
+  const prev = () => scRef.current?.scrollBy({ left: -amount(), behavior: 'smooth' })
+  const next = () => scRef.current?.scrollBy({ left: amount(), behavior: 'smooth' })
 
   return (
     <div>
-      {/* Arrows */}
-      <div className="flex gap-2 mb-6">
+      <div className="flex justify-end gap-3 mb-6">
         <button
           onClick={prev}
-          disabled={current === 0}
-          className="w-10 h-10 rounded-full border border-white/30 flex items-center justify-center text-white hover:border-primary hover:text-primary transition-all disabled:opacity-30 disabled:cursor-not-allowed"
-          aria-label="Предыдущий"
+          aria-label="Previous"
+          className="w-12 h-12 rounded-full border border-foreground/15 flex items-center justify-center text-foreground transition-all duration-300 hover:bg-primary hover:border-primary"
         >
           <ChevronLeft size={20} />
         </button>
         <button
           onClick={next}
-          disabled={current === projects.length - 1}
-          className="w-10 h-10 rounded-full border border-white/30 flex items-center justify-center text-white hover:border-primary hover:text-primary transition-all disabled:opacity-30 disabled:cursor-not-allowed"
-          aria-label="Следующий"
+          aria-label="Next"
+          className="w-12 h-12 rounded-full border border-foreground/15 flex items-center justify-center text-foreground transition-all duration-300 hover:bg-primary hover:border-primary"
         >
           <ChevronRight size={20} />
         </button>
       </div>
 
-      {/* Slider track */}
-      <div className="overflow-hidden">
-        <div
-          className="flex gap-4 transition-transform duration-500 ease-in-out"
-          style={{ transform: `translateX(calc(-${current} * (min(500px, 80vw) + 16px)))` }}
-        >
-          {projects.map((project, i) => (
-            <div key={i} className="flex-none" style={{ width: 'min(500px, 80vw)' }}>
-              <div
-                className="relative overflow-hidden rounded-xl bg-white"
-                style={{ aspectRatio: '4/3' }}
-              >
-                <Image
-                  src={project.image}
-                  alt={project.subtitle}
-                  fill
-                  className="object-cover"
-                />
-              </div>
-              <div className="mt-3">
-                <p className="text-gray-400 text-sm">{project.title}</p>
-                <p className="text-white font-bold text-base">{project.subtitle}</p>
-              </div>
+      <div
+        ref={scRef}
+        className="flex gap-6 overflow-x-auto scroll-smooth snap-x snap-mandatory pb-2 scrollbar-hide -mx-4 px-4 sm:mx-0 sm:px-0"
+      >
+        {projects.map((project, i) => (
+          <figure key={i} className="flex-none snap-start m-0" style={{ width: 'min(78vw, 440px)' }}>
+            <div
+              className="relative overflow-hidden rounded-2xl shadow-[0_24px_60px_-34px_rgba(43,40,35,0.5)]"
+              style={{ height: 480 }}
+            >
+              <Image src={project.image} alt={project.subtitle} fill className="object-cover" />
             </div>
-          ))}
-        </div>
+            <figcaption className="pt-5">
+              <div className="text-xs tracking-[2px] uppercase text-muted-foreground font-semibold">{project.title}</div>
+              <div className="font-serif text-2xl font-semibold text-foreground mt-1 capitalize">{project.subtitle}</div>
+            </figcaption>
+          </figure>
+        ))}
       </div>
     </div>
   )

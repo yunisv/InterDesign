@@ -66,7 +66,7 @@ docker compose down -v
 
 | Сервис   | URL                          |
 |----------|------------------------------|
-| Фронтенд | http://localhost:3000         |
+| Фронтенд | http://localhost:3000        |
 | Админка  | http://localhost:3000/admin  |
 | API      | http://localhost:8000        |
 | API docs | http://localhost:8000/docs   |

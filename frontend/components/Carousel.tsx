@@ -1,109 +1,86 @@
 'use client'
 
 import { useEffect, useRef, useState, ReactNode } from 'react'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
 
 interface CarouselProps {
   children: ReactNode[]
   autoPlay?: boolean
   interval?: number
-  showDots?: boolean
-  showArrows?: boolean
 }
 
-export default function Carousel({
-  children,
-  autoPlay = true,
-  interval = 5000,
-  showDots = true,
-  showArrows = true,
-}: CarouselProps) {
+export default function Carousel({ children, autoPlay = true, interval = 5200 }: CarouselProps) {
   const [current, setCurrent] = useState(0)
-  const containerRef = useRef<HTMLDivElement>(null)
-  const autoPlayRef = useRef<NodeJS.Timeout | null>(null)
-
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const slides = Array.isArray(children) ? children : [children]
-  const totalSlides = slides.length
+  const n = slides.length
 
-  const goToSlide = (index: number) => {
-    setCurrent(index % totalSlides)
-  }
+  const go = (i: number) => setCurrent(((i % n) + n) % n)
 
-  const next = () => {
-    setCurrent((prev) => (prev + 1) % totalSlides)
-  }
-
-  const prev = () => {
-    setCurrent((prev) => (prev - 1 + totalSlides) % totalSlides)
+  const restart = () => {
+    if (timerRef.current) clearInterval(timerRef.current)
+    if (!autoPlay) return
+    timerRef.current = setInterval(() => setCurrent((c) => (c + 1) % n), interval)
   }
 
   useEffect(() => {
-    if (!autoPlay) return
-
-    autoPlayRef.current = setInterval(() => {
-      next()
-    }, interval)
-
+    restart()
     return () => {
-      if (autoPlayRef.current) clearInterval(autoPlayRef.current)
+      if (timerRef.current) clearInterval(timerRef.current)
     }
-  }, [autoPlay, interval])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [n, interval, autoPlay])
 
   return (
-    <div ref={containerRef} className="relative w-full h-full overflow-hidden group">
-      {/* Slides */}
-      <div className="relative w-full h-full">
-        {slides.map((slide, index) => (
-          <div
-            key={index}
-            className={`absolute inset-0 transition-opacity duration-500 ${
-              index === current ? 'opacity-100' : 'opacity-0'
-            }`}
-          >
-            {slide}
-          </div>
-        ))}
-      </div>
-
-      {/* Previous Button */}
-      {showArrows && (
-        <button
-          onClick={prev}
-          className="absolute left-4 top-1/2 -translate-y-1/2 z-20 bg-black/30 hover:bg-black/50 text-white p-3 rounded-full transition-all duration-300 opacity-0 group-hover:opacity-100"
-          aria-label="Previous slide"
+    <div className="relative">
+      <div className="relative overflow-hidden rounded-[22px] shadow-[0_40px_90px_-40px_rgba(43,40,35,0.55)]">
+        <div
+          className="flex transition-transform duration-[900ms] ease-[cubic-bezier(.16,1,.3,1)]"
+          style={{ transform: `translateX(-${current * 100}%)` }}
         >
-          <ChevronLeft size={24} />
-        </button>
-      )}
-
-      {/* Next Button */}
-      {showArrows && (
-        <button
-          onClick={next}
-          className="absolute right-4 top-1/2 -translate-y-1/2 z-20 bg-black/30 hover:bg-black/50 text-white p-3 rounded-full transition-all duration-300 opacity-0 group-hover:opacity-100"
-          aria-label="Next slide"
-        >
-          <ChevronRight size={24} />
-        </button>
-      )}
-
-      {/* Dots */}
-      {showDots && (
-        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex gap-2">
-          {slides.map((_, index) => (
-            <button
-              key={index}
-              onClick={() => goToSlide(index)}
-              className={`h-2 rounded-full transition-all duration-300 ${
-                index === current
-                  ? 'bg-white w-8'
-                  : 'bg-white/50 hover:bg-white/70 w-2'
-              }`}
-              aria-label={`Go to slide ${index + 1}`}
-            />
+          {slides.map((slide, i) => (
+            <div key={i} className="flex-none w-full">
+              {slide}
+            </div>
           ))}
         </div>
-      )}
+      </div>
+
+      <button
+        onClick={() => {
+          go(current - 1)
+          restart()
+        }}
+        aria-label="Previous slide"
+        className="absolute top-1/2 -left-3 md:-left-7 -translate-y-1/2 z-10 w-12 h-12 md:w-14 md:h-14 rounded-full bg-white text-foreground shadow-[0_10px_30px_-8px_rgba(43,40,35,0.4)] flex items-center justify-center text-xl transition-all duration-300 hover:bg-primary hover:scale-105"
+      >
+        ‹
+      </button>
+      <button
+        onClick={() => {
+          go(current + 1)
+          restart()
+        }}
+        aria-label="Next slide"
+        className="absolute top-1/2 -right-3 md:-right-7 -translate-y-1/2 z-10 w-12 h-12 md:w-14 md:h-14 rounded-full bg-white text-foreground shadow-[0_10px_30px_-8px_rgba(43,40,35,0.4)] flex items-center justify-center text-xl transition-all duration-300 hover:bg-primary hover:scale-105"
+      >
+        ›
+      </button>
+
+      <div className="flex gap-2.5 justify-center mt-7">
+        {slides.map((_, i) => (
+          <button
+            key={i}
+            onClick={() => {
+              go(i)
+              restart()
+            }}
+            aria-label={`Go to slide ${i + 1}`}
+            className={`h-2.5 rounded-full transition-all duration-300 ${
+              i === current ? 'w-7 bg-primary' : 'w-2.5 bg-foreground/20 hover:bg-foreground/35'
+            }`}
+          />
+        ))}
+      </div>
     </div>
   )
 }
