@@ -55,6 +55,11 @@ services:
       # contact-form traffic for a bit, THEN switch this to "On" to
       # actually start blocking.
       MODSEC_RULE_ENGINE: "DetectionOnly"
+      # Default is RelevantOnly, which only logs 4xx/5xx responses — in
+      # DetectionOnly mode nothing gets blocked so status stays 200 and
+      # nothing gets logged. Force full logging while testing; switch
+      # back to "RelevantOnly" once MODSEC_RULE_ENGINE is "On".
+      MODSEC_AUDIT_ENGINE: "On"
     volumes:
       - ./nginx/default.conf:/etc/nginx/templates/conf.d/default.conf.template:ro
       - ./nginx/logs:/var/log/nginx
