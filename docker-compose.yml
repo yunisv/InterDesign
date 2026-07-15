@@ -39,16 +39,29 @@ services:
       NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8000}
 
   nginx:
-    image: nginx:alpine
+    image: owasp/modsecurity-crs:4.25-nginx-lts
     restart: unless-stopped
     depends_on:
       - frontend
       - backend
+    environment:
+      BACKEND: "http://frontend:3000"
+      PARANOIA: "1"
+      BLOCKING_PARANOIA: "1"
+      ANOMALY_INBOUND: "5"
+      ANOMALY_OUTBOUND: "4"
+      # Start in log-only mode. Watch nginx/logs/modsec_audit.log (or
+      # `docker compose logs nginx`) for false positives on login/upload/
+      # contact-form traffic for a bit, THEN switch this to "On" to
+      # actually start blocking.
+      MODSEC_RULE_ENGINE: "DetectionOnly"
     volumes:
-      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./nginx/default.conf:/etc/nginx/templates/conf.d/default.conf.template:ro
       - ./nginx/logs:/var/log/nginx
     ports:
-      - "80:80"
+      - "80:8080"
+    healthcheck:
+      disable: true
 
 volumes:
   pgdata:
