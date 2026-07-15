@@ -50,16 +50,11 @@ services:
       BLOCKING_PARANOIA: "1"
       ANOMALY_INBOUND: "5"
       ANOMALY_OUTBOUND: "4"
-      # Start in log-only mode. Watch nginx/logs/modsec_audit.log (or
-      # `docker compose logs nginx`) for false positives on login/upload/
-      # contact-form traffic for a bit, THEN switch this to "On" to
-      # actually start blocking.
-      MODSEC_RULE_ENGINE: "DetectionOnly"
-      # Default is RelevantOnly, which only logs 4xx/5xx responses — in
-      # DetectionOnly mode nothing gets blocked so status stays 200 and
-      # nothing gets logged. Force full logging while testing; switch
-      # back to "RelevantOnly" once MODSEC_RULE_ENGINE is "On".
-      MODSEC_AUDIT_ENGINE: "On"
+      # Real blocking is on. If a legitimate flow (login/upload/contact
+      # form) starts getting 403s, set this back to "DetectionOnly" to
+      # stop blocking while you check nginx/logs for what tripped it.
+      MODSEC_RULE_ENGINE: "On"
+      MODSEC_AUDIT_ENGINE: "RelevantOnly"
     volumes:
       - ./nginx/default.conf:/etc/nginx/templates/conf.d/default.conf.template:ro
       - ./nginx/modsecurity-override.conf:/etc/nginx/templates/modsecurity.d/modsecurity-override.conf.template:ro
